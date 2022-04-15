@@ -3,7 +3,7 @@ const tradeControllers = require("./../controllers/tradeControllers");
 
 /**
  * @swagger
- * /:2
+ * /
  *  get:
  *    summary : This endpoint is to get all the trades.
  *    description : Use to request all the trades.
@@ -63,6 +63,8 @@ const tradeControllers = require("./../controllers/tradeControllers");
  *
  */
 const router = express.Router();
+router.route("/updateClosing/:id").patch(tradeControllers.updateClosingEnties);
+
 router
   .route("/")
   .get(tradeControllers.getAllTrades)

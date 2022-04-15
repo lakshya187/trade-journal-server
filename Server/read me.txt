@@ -1,0 +1,8 @@
+Initial setup 
+1) Clone the repository 
+2) run 'cd server' inside the directory terminal 
+3) inside the server run the command "npm i"
+4) while inside the server folder run the comnmand "npm start"
+
+API Documentation 
+http://localhost:5000/api-docs

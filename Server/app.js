@@ -1,9 +1,14 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
 const swaggerJsDocs = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
+const cors = require("cors");
 app.use(express.json());
+app.use(cors());
+
+app.use(morgan("dev"));
 const swaggerOptions = {
   swaggerDefinition: {
     info: {
