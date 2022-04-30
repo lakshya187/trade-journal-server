@@ -1,16 +1,24 @@
 const mongoose = require("mongoose");
 const app = require(`${__dirname}/app`);
 const morgan = require("morgan");
+const dotenv = require("dotenv");
 app.use(morgan("dev"));
+dotenv.config({ path: `${__dirname}/config.env` });
 //The connect string responsible to establish connection between mongoDB and the code.
-const connectStr = `mongodb+srv://lakshya187:jc522066y@cluster0.xb1zq.mongodb.net/Trade_journal?retryWrites=true&w=majority`;
 
 mongoose
-  .connect(connectStr, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    process.env.MONGODB_CONNECT_STRING.replace(
+      "<PASSWORD>",
+      process.env.PASSWORD
+    ),
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => console.log("Connection to the database was successful"));
 
-const port = 5000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(process.env.PORT, () =>
+  console.log(`Server running on port ${process.env.PORT}`)
+);

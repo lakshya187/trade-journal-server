@@ -1,14 +1,43 @@
 const express = require("express");
 //importing the trade model. Which is built using mongoose and therefore has all the methods for querying insdie database
 const Trade = require(`./../models/tradeModel`);
+const User = require("./../models/userModel.js");
 
 exports.getAllTrades = async (req, res) => {
   try {
-    const allTrades = await Trade.find();
+    // console.log(req.user.id);
+    // const trades = await Trade.aggregate([
+    //   {
+    //     $documents: {
+    //       user: "626683ae8895262abfbd4a84",
+    //     },
+    //   },
+    // ]);
+    //   .populate("allTrades")
+    // const user = await User.aggregate([
+    //   { $match: { _id: req.user.id } },
+    //   {
+    //     $addFields: {
+    //       show: true,
+    //     },
+    //   },
+    // ]);
+    const user = await User.findById(req.user.id).populate({
+      path: "allTrades",
+      options: {
+        sort: { openDate: -1 },
+        skip: 0,
+        limit: 10,
+      },
+      match: {},
+    });
+
+    // console.log(user);
+
     res.status(200).json({
       message: "Success",
       data: {
-        trades: allTrades,
+        trades: user.allTrades,
       },
     });
   } catch (err) {
@@ -64,6 +93,11 @@ exports.updateTrade = async (req, res) => {
 };
 exports.createTrade = async (req, res) => {
   try {
+    //Allow nested routes
+
+    if (!req.body.user) {
+      req.body.user = req.user.id;
+    }
     const newTrade = await Trade.create(req.body);
     res.status(201).json({
       message: "Sucess",
@@ -95,11 +129,13 @@ exports.deleteTrade = async (req, res) => {
 };
 exports.updateClosingEnties = async (req, res) => {
   try {
+    console.log(typeof req.body.data.price);
     //Getting the document
     const currentDocument = await Trade.findById(req.params.id);
     //calculating the updaed vcalue
     //Pirce : 20,quantity :10
-    const currHoldings = currentDocument.currentHoldings - req.body.quantity;
+    const currHoldings =
+      currentDocument.currentHoldings - +req.body.data.quantity;
     if (currHoldings <= -1) {
       throw new Error("you cant close the trade with this amount");
     }
@@ -111,7 +147,7 @@ exports.updateClosingEnties = async (req, res) => {
     });
     //Creating  a new close trade entry
     const closingTradeEntry = {
-      ...req.body,
+      ...req.body.data,
       weight: req.body.quantity * req.body.price,
     };
     console.log(closingTradeEntry);
@@ -120,8 +156,7 @@ exports.updateClosingEnties = async (req, res) => {
       {
         $push: {
           closingEntries: {
-            ...req.body,
-            weight: req.body.quantity * req.body.price,
+            ...req.body.data,
           },
         },
       },

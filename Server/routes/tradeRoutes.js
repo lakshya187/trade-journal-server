@@ -1,5 +1,6 @@
 const express = require("express");
 const tradeControllers = require("./../controllers/tradeControllers");
+const authController = require("./../controllers/authController");
 
 /**
  * @swagger
@@ -67,8 +68,8 @@ router.route("/updateClosing/:id").patch(tradeControllers.updateClosingEnties);
 
 router
   .route("/")
-  .get(tradeControllers.getAllTrades)
-  .post(tradeControllers.createTrade);
+  .get(authController.protect, tradeControllers.getAllTrades)
+  .post(authController.protect, tradeControllers.createTrade);
 
 router
   .route("/:id")

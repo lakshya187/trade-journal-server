@@ -1,10 +1,13 @@
 const express = require("express");
-const app = express();
 const morgan = require("morgan");
-const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
 const swaggerJsDocs = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const cors = require("cors");
+
+const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
+const userRouter = require("./routes/userRoute");
+
+const app = express();
 app.use(express.json());
 app.use(cors());
 
@@ -22,4 +25,5 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDocs(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/trades", tradeRouter);
+app.use("/users", userRouter);
 module.exports = app;
