@@ -41,7 +41,7 @@ exports.getAllTrades = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(400).json({
       status: "Failed",
       message: err,
@@ -58,7 +58,7 @@ exports.getSingleTrade = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(400).json({
       status: "Failed",
       message: err,
@@ -67,7 +67,7 @@ exports.getSingleTrade = async (req, res) => {
 };
 
 exports.updateTrade = async (req, res) => {
-  console.log(req.params.id, req.body);
+  // console.log(req.params.id, req.body);
   try {
     const updatedTrade = await Trade.findByIdAndUpdate(
       req.params.id,
@@ -84,7 +84,7 @@ exports.updateTrade = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(400).json({
       status: "failed",
       message: err,
@@ -106,7 +106,7 @@ exports.createTrade = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(400).json({
       status: "failed",
       message: err,
@@ -129,7 +129,7 @@ exports.deleteTrade = async (req, res) => {
 };
 exports.updateClosingEnties = async (req, res) => {
   try {
-    console.log(typeof req.body.data.price);
+    // console.log(typeof req.body.data.price);
     //Getting the document
     const currentDocument = await Trade.findById(req.params.id);
     //calculating the updaed vcalue
@@ -150,7 +150,7 @@ exports.updateClosingEnties = async (req, res) => {
       ...req.body.data,
       weight: req.body.quantity * req.body.price,
     };
-    console.log(closingTradeEntry);
+    // console.log(closingTradeEntry);
     const updatedTrade = await Trade.findByIdAndUpdate(
       req.params.id,
       {
@@ -172,7 +172,7 @@ exports.updateClosingEnties = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(400).json({
       status: "failed",
       message: err,
@@ -182,13 +182,13 @@ exports.updateClosingEnties = async (req, res) => {
 
 exports.updateCurrentHoldings = function (req, res) {
   try {
-    console.log(this);
+    // console.log(this);
     res.status(200).json({
       status: "Sucess",
       message: "The trade has been updaed sucessfully",
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(401).json({ message: sucess });
   }
 };

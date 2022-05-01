@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const swaggerJsDocs = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const cors = require("cors");
+const compression = require("compression");
 
 const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
 const userRouter = require("./routes/userRoute");
@@ -10,7 +11,7 @@ const userRouter = require("./routes/userRoute");
 const app = express();
 app.use(express.json());
 app.use(cors());
-
+app.use(compression());
 app.use(morgan("dev"));
 const swaggerOptions = {
   swaggerDefinition: {

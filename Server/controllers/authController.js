@@ -26,7 +26,7 @@ exports.signUp = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(400).json({
       status: "failed",
       message: err,
@@ -56,7 +56,7 @@ exports.login = async (req, res, next) => {
       user: user,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(401).json({
       status: "Failed",
       message: err,
@@ -79,7 +79,7 @@ exports.protect = async (req, res, next) => {
     }
     //2) Validating the token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    console.log(decoded);
+    // console.log(decoded);
     if (!decoded) {
       throw new Error("The user is not vaild");
     }
@@ -94,7 +94,7 @@ exports.protect = async (req, res, next) => {
     req.user = currentUser;
     next();
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(401).json({
       status: "failed",
       message: err,
@@ -104,8 +104,8 @@ exports.protect = async (req, res, next) => {
 
 exports.authorize = async (req, res) => {
   try {
-    console.log(req.headers);
-    console.log("working");
+    // console.log(req.headers);
+    // console.log("working");
     // console.log(req.headers);
     //1) Check if the token exsists insdie the header
     let token = "";
@@ -118,10 +118,10 @@ exports.authorize = async (req, res) => {
     if (!token) {
       throw new Error("You should login first");
     }
-    console.log(token);
+    // console.log(token);
     //2) Check if the token is vailed
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    console.log(decoded);
+    // console.log(decoded);
     if (!decoded) {
       throw new Error("The token is invaild");
     }
@@ -130,7 +130,7 @@ exports.authorize = async (req, res) => {
     if (!user) {
       throw new Error("The user does not exsists");
     }
-    console.log(user);
+    // console.log(user);
     //4) Check if the password was changed afetr the token was issued
     if (user.compareTimestamps(decoded.iat)) {
       throw new Error("password was recently changed");
@@ -140,7 +140,7 @@ exports.authorize = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(401).json({
       status: "Failed",
       message: "invailed token",
