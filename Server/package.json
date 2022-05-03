@@ -1,15 +1,24 @@
 {
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "heroku": "^7.60.2",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.8",
+    "mongoose-autopopulate": "^0.16.1",
     "morgan": "^1.10.0",
     "swagger-jsdoc": "^6.1.0",
-    "swagger-ui-express": "^4.3.0"
+    "swagger-ui-express": "^4.3.0",
+    "validator": "^13.7.0"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "postinstall": "bower install && grunt build"
   },
   "name": "server",
   "version": "1.0.0",
@@ -23,6 +32,10 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/lakshya187/Trade-Journal/issues"
+  },
+  "engines": {
+    "node": "14.17.3",
+    "npm": "6.14.13"
   },
   "homepage": "https://github.com/lakshya187/Trade-Journal#readme",
   "proxy": "http://localhost:3001"
