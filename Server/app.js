@@ -4,12 +4,15 @@ const swaggerJsDocs = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const cors = require("cors");
 const compression = require("compression");
+const multer = require("multer");
 
 const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
 const userRouter = require("./routes/userRoute");
+const req = require("express/lib/request");
 
 const app = express();
 app.use(express.json());
+
 app.use(cors());
 app.use(compression());
 app.use(morgan("dev"));
