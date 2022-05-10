@@ -178,25 +178,17 @@ exports.updateCurrentHoldings = function (req, res) {
   }
 };
 
-// function generateJSONFile(data) {
-//   try {
-//     const jsonFile = fs.writeFileSync("data.json", JSON.stringify(data));
-//     return json
-//   } catch (err) {
-//     console.error(err);
-//   }
-// }
-
 exports.uploadExcelTrades = (req, res) => {
   try {
-    const { filename } = req.file;
+    console.log(req);
+    // const { filename } = req.file;
 
-    console.log(filename);
-    const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
-    const sheetNames = workBook.SheetNames[0];
-    const sheetValues = workBook.Sheets[sheetNames];
-    const jsonData = xlsx.utils.sheet_to_json(sheetValues);
-    console.log(jsonData);
+    // console.log(filename);
+    // const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
+    // const sheetNames = workBook.SheetNames[0];
+    // const sheetValues = workBook.Sheets[sheetNames];
+    // const jsonData = xlsx.utils.sheet_to_json(sheetValues);
+    // console.log(jsonData);
 
     res.status(201).json({
       status: "sucess",
