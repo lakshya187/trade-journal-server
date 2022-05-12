@@ -1,5 +1,24 @@
 {
+  "name": "trade-journal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "dependencies": {
-    "swagger-ui-express": "^4.3.0"
-  }
+    "swagger-ui-express": "^4.3.0",
+    "swagger-ui-dist": "^4.10.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lakshya187/trade-journal.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lakshya187/trade-journal/issues"
+  },
+  "homepage": "https://github.com/lakshya187/trade-journal#readme"
 }
