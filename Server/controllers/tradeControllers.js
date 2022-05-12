@@ -1,27 +1,12 @@
 const express = require("express");
-//importing the trade model. Which is built using mongoose and therefore has all the methods for querying insdie database
+const xlsx = require("xlsx");
+const fs = require("fs");
+
 const Trade = require(`./../models/tradeModel`);
 const User = require("./../models/userModel.js");
 
 exports.getAllTrades = async (req, res) => {
   try {
-    // console.log(req.user.id);
-    // const trades = await Trade.aggregate([
-    //   {
-    //     $documents: {
-    //       user: "626683ae8895262abfbd4a84",
-    //     },
-    //   },
-    // ]);
-    //   .populate("allTrades")
-    // const user = await User.aggregate([
-    //   { $match: { _id: req.user.id } },
-    //   {
-    //     $addFields: {
-    //       show: true,
-    //     },
-    //   },
-    // ]);
     const user = await User.findById(req.user.id).populate({
       path: "allTrades",
       options: {
@@ -190,5 +175,27 @@ exports.updateCurrentHoldings = function (req, res) {
   } catch (err) {
     // console.log(err);
     res.status(401).json({ message: sucess });
+  }
+};
+
+exports.uploadExcelTrades = (req, res) => {
+  try {
+    console.log(req);
+    // const { filename } = req.file;
+
+    // console.log(filename);
+    // const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
+    // const sheetNames = workBook.SheetNames[0];
+    // const sheetValues = workBook.Sheets[sheetNames];
+    // const jsonData = xlsx.utils.sheet_to_json(sheetValues);
+    // console.log(jsonData);
+
+    res.status(201).json({
+      status: "sucess",
+      data: {},
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ status: "failed", message: err });
   }
 };

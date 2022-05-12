@@ -1,7 +1,7 @@
 const express = require("express");
 const tradeControllers = require("./../controllers/tradeControllers");
 const authController = require("./../controllers/authController");
-
+const multer = require("multer");
 /**
  * @swagger
  * /
@@ -63,9 +63,24 @@ const authController = require("./../controllers/authController");
  *            description : To test the get method
  *
  */
+
+const fileStorageEngine = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./excelUploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}__${file.originalname}`);
+  },
+});
+const upload = multer({ storage: fileStorageEngine });
+
 const router = express.Router();
 router.route("/updateClosing/:id").patch(tradeControllers.updateClosingEnties);
-
+router.post(
+  "/uploadExcel",
+  upload.single("file"),
+  tradeControllers.uploadExcelTrades
+);
 router
   .route("/")
   .get(authController.protect, tradeControllers.getAllTrades)
