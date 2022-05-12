@@ -25,7 +25,6 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Server for the trade journal",
-  "main": "server.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lakshya187/Trade-Journal.git"
