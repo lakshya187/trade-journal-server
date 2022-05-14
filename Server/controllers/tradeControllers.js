@@ -173,26 +173,36 @@ exports.updateCurrentHoldings = function (req, res) {
       message: "The trade has been updaed sucessfully",
     });
   } catch (err) {
-    // console.log(err);
     res.status(401).json({ message: sucess });
   }
 };
 
-exports.uploadExcelTrades = (req, res) => {
+exports.uploadExcelTrades = async (req, res) => {
   try {
-    console.log(req);
-    // const { filename } = req.file;
-
-    // console.log(filename);
-    // const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
-    // const sheetNames = workBook.SheetNames[0];
-    // const sheetValues = workBook.Sheets[sheetNames];
-    // const jsonData = xlsx.utils.sheet_to_json(sheetValues);
-    // console.log(jsonData);
-
+    // console.log(req.user);
+    const { _id } = req.user;
+    console.log(_id);
+    const { filename } = req.file;
+    const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
+    const sheetNames = workBook.SheetNames[0];
+    const sheetValues = workBook.Sheets[sheetNames];
+    const jsonData = xlsx.utils.sheet_to_json(sheetValues);
+    const modData = jsonData.map((t) => {
+      const tyoeOfTrade = t.tradeQuantity >= 0 ? "Long" : "Short";
+      t.typeOfTrade = tyoeOfTrade;
+      t.tradeQuantity = Math.abs(t.tradeQuantity);
+      t.currentHoldings = 0;
+      t.user = _id;
+      const closingEntry = { price: t.closePrice, quantity: t.tradeQuantity };
+      t.closingEntries = [];
+      t.closingEntries.push(closingEntry);
+      return t;
+    });
+    console.log(modData);
+    const newTrades = await Trade.insertMany(modData);
+    // console.log(newTrades);
     res.status(201).json({
       status: "sucess",
-      data: {},
     });
   } catch (err) {
     console.log(err);
