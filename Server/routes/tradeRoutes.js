@@ -78,6 +78,7 @@ const router = express.Router();
 router.route("/updateClosing/:id").patch(tradeControllers.updateClosingEnties);
 router.post(
   "/uploadExcel",
+  authController.protect,
   upload.single("file"),
   tradeControllers.uploadExcelTrades
 );
