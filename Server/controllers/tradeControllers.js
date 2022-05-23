@@ -192,7 +192,6 @@ exports.updateCurrentHoldings = function (req, res) {
 
 exports.uploadExcelTrades = async (req, res) => {
   try {
-    // console.log(req.user);
     const { _id } = req.user;
     const { filename } = req.file;
     const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
