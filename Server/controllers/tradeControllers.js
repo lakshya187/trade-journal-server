@@ -12,21 +12,18 @@ exports.getAllTrades = async (req, res) => {
       options: {
         sort: { openDate: -1 },
         skip: 0,
-        limit: 10,
+        limit: 100,
       },
       match: {},
     });
-
-    // console.log(user);
-
     res.status(200).json({
-      message: "Success",
+      message: "success",
       data: {
         trades: user.allTrades,
       },
     });
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     res.status(400).json({
       status: "Failed",
       message: err,
@@ -91,7 +88,7 @@ exports.createTrade = async (req, res) => {
       },
     });
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     res.status(400).json({
       status: "failed",
       message: err,
@@ -125,17 +122,28 @@ exports.updateClosingEnties = async (req, res) => {
       throw new Error("you cant close the trade with this amount");
     }
     //creating the updaed object
-    const updatedHoldings = { currentHoldings: currHoldings };
     //Updating the object
-    const updatedCurrentHolding = await Trade.findByIdAndUpdate(req.params.id, {
-      $set: updatedHoldings,
-    });
+    // const updatedCurrentHolding = await Trade.findByIdAndUpdate(req.params.id, {
+    //   $set: updatedHoldings,
+    // });
     //Creating  a new close trade entry
-    const closingTradeEntry = {
-      ...req.body.data,
-      weight: req.body.quantity * req.body.price,
-    };
+    // const closingTradeEntry = {
+    //   ...req.body.data,
+    //   weight: req.body.quantity * req.body.price,
+    // };
     // console.log(closingTradeEntry);
+    const newEntires = [req.body.data, ...currentDocument.closingEntries];
+    let val = 0;
+    newEntires.forEach((el) => {
+      const { price, quantity } = el;
+      val += price * quantity;
+    });
+    const closePriceCal = val / currentDocument.tradeQuantity;
+
+    const pl =
+      (closePriceCal - currentDocument.openPrice) *
+      currentDocument.tradeQuantity;
+
     const updatedTrade = await Trade.findByIdAndUpdate(
       req.params.id,
       {
@@ -144,7 +152,13 @@ exports.updateClosingEnties = async (req, res) => {
             ...req.body.data,
           },
         },
+        $set: {
+          currentHoldings: currHoldings,
+          closingPriceCalculated: closePriceCal,
+          profitLoss: pl,
+        },
       },
+
       {
         new: true,
         runValidators: true,
@@ -157,7 +171,7 @@ exports.updateClosingEnties = async (req, res) => {
       },
     });
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     res.status(400).json({
       status: "failed",
       message: err,
@@ -167,7 +181,6 @@ exports.updateClosingEnties = async (req, res) => {
 
 exports.updateCurrentHoldings = function (req, res) {
   try {
-    // console.log(this);
     res.status(200).json({
       status: "Sucess",
       message: "The trade has been updaed sucessfully",
@@ -181,7 +194,6 @@ exports.uploadExcelTrades = async (req, res) => {
   try {
     // console.log(req.user);
     const { _id } = req.user;
-    console.log(_id);
     const { filename } = req.file;
     const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
     const sheetNames = workBook.SheetNames[0];
@@ -208,4 +220,53 @@ exports.uploadExcelTrades = async (req, res) => {
     console.log(err);
     res.status(400).json({ status: "failed", message: err });
   }
+};
+
+exports.getStats = async (req, res, next) => {
+  const user = req.user._id;
+  const data = await Trade.aggregate([
+    {
+      $match: {
+        user: user,
+      },
+    },
+    {
+      $group: {
+        _id: "Stats",
+        totalTrades: { $sum: 1 },
+        totalAmountInvested: {
+          $sum: { $multiply: ["$openPrice", "$tradeQuantity"] },
+        },
+        totalProfit: {
+          $sum: {
+            $cond: [{ $gt: ["$profitLoss", 0] }, { $sum: "$profitLoss" }, null],
+          },
+        },
+        totolLoss: {
+          $sum: {
+            $cond: [{ $lt: ["$profitLoss", 0] }, { $sum: "$profitLoss" }, null],
+          },
+        },
+        profitTrades: {
+          $sum: {
+            $cond: [{ $gt: ["$profitLoss", 0] }, 1, 0],
+          },
+        },
+        lossTrades: {
+          $sum: {
+            $cond: [{ $lt: ["$profitLoss", 0] }, 1, 0],
+          },
+        },
+      },
+    },
+  ]);
+
+  console.log(data);
+
+  res.status(200).json({
+    message: "Success",
+    data: {
+      trades: data,
+    },
+  });
 };
