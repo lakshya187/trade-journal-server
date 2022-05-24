@@ -8,6 +8,7 @@ const multer = require("multer");
 
 const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
 const userRouter = require("./routes/userRoute");
+const optionsRouter = require("./routes/optionsRoute");
 const req = require("express/lib/request");
 
 const app = express();
@@ -29,5 +30,6 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDocs(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/trades", tradeRouter);
+app.use("/options", optionsRouter);
 app.use("/users", userRouter);
 module.exports = app;

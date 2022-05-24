@@ -55,7 +55,11 @@ userSchema.virtual("allTrades", {
   localField: "_id",
   foreignField: "user",
 });
-
+userSchema.virtual("allOptionsTrade", {
+  ref: "Options",
+  localField: "_id",
+  foreignField: "user",
+});
 //Instance method to check if the password was changed after the token was issued
 userSchema.methods.compareTimestamps = function (jwtTimeStamp) {
   if (this.passwordChangedAt) {

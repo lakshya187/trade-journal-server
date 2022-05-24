@@ -75,8 +75,6 @@ exports.updateTrade = async (req, res) => {
 };
 exports.createTrade = async (req, res) => {
   try {
-    //Allow nested routes
-
     if (!req.body.user) {
       req.body.user = req.user.id;
     }
@@ -111,27 +109,14 @@ exports.deleteTrade = async (req, res) => {
 };
 exports.updateClosingEnties = async (req, res) => {
   try {
-    // console.log(typeof req.body.data.price);
-    //Getting the document
     const currentDocument = await Trade.findById(req.params.id);
-    //calculating the updaed vcalue
-    //Pirce : 20,quantity :10
+
     const currHoldings =
       currentDocument.currentHoldings - +req.body.data.quantity;
     if (currHoldings <= -1) {
       throw new Error("you cant close the trade with this amount");
     }
-    //creating the updaed object
-    //Updating the object
-    // const updatedCurrentHolding = await Trade.findByIdAndUpdate(req.params.id, {
-    //   $set: updatedHoldings,
-    // });
-    //Creating  a new close trade entry
-    // const closingTradeEntry = {
-    //   ...req.body.data,
-    //   weight: req.body.quantity * req.body.price,
-    // };
-    // console.log(closingTradeEntry);
+
     const newEntires = [req.body.data, ...currentDocument.closingEntries];
     let val = 0;
     newEntires.forEach((el) => {
