@@ -13,22 +13,25 @@ const optionsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
+  date: {
+    type: Date,
+    required: true,
+  },
+  netProfitLoss: { type: Number },
   leg: [
     {
+      expireDate: { type: Date, required: true },
       premium: { type: Number, required: true },
       lotSize: { type: Number, required: true },
       quantity: { type: Number, required: true },
       optionType: { type: String, required: true },
       strike: { type: String, required: true },
+      profitLoss: { type: Number, default: 0 },
       currentHoldings: {
         type: Number,
-        set: function (a) {
-          return 20;
-        },
         default: 0,
       },
-      closingPrice: { default: 0, type: Number },
+      closingPremium: { default: 0, type: Number },
       typeOfTrade: {
         type: String,
         required: true,
@@ -41,6 +44,7 @@ const optionsSchema = new mongoose.Schema({
         type: Date,
         required: true,
       },
+
       closingEntries: [
         {
           premium: Number,
@@ -51,8 +55,6 @@ const optionsSchema = new mongoose.Schema({
           totalQuantitySold: Number,
         },
       ],
-      closePrice: { type: Number },
-      profitLoss: { type: Number },
     },
   ],
 
@@ -60,14 +62,6 @@ const optionsSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "user",
     required: true,
-  },
-  closingPriceCalculated: {
-    type: Number,
-    default: 0,
-  },
-  profitLoss: {
-    type: Number,
-    default: 0,
   },
   entryAnalysis: {
     type: String,

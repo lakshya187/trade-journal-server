@@ -10,4 +10,5 @@ router.patch(
   authController.protect,
   optionsController.updateClosingLeg
 );
+router.get("/:id", authController.protect, optionsController.getSingleOption);
 module.exports = router;

@@ -192,11 +192,14 @@ exports.uploadExcelTrades = async (req, res) => {
       const closingEntry = { price: t.closePrice, quantity: t.tradeQuantity };
       t.closingEntries = [];
       t.closingEntries.push(closingEntry);
+      t.closingPriceCalculated = t.closePrice;
+      t.profitLoss = +((t.closePrice - t.openPrice) * t.tradeQuantity).toFixed(
+        2
+      );
       return t;
     });
     console.log(modData);
     const newTrades = await Trade.insertMany(modData);
-    // console.log(newTrades);
     res.status(201).json({
       status: "sucess",
     });
