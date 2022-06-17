@@ -1,7 +1,6 @@
+const luxon = require("luxon");
 const express = require("express");
 const Options = require("../models/optionsModel");
-const { off } = require("../models/tradeModel");
-const Trade = require("../models/tradeModel");
 const User = require("../models/userModel");
 
 exports.getAllOptions = async (req, res, next) => {
@@ -108,3 +107,110 @@ exports.getSingleOption = async (req, res) => {
     });
   }
 };
+
+exports.getAnalytics = async (req, res) => {
+  try {
+    const currentDate = new Date(Date.now());
+    const day = new Date(
+      luxon.DateTime.local(currentDate)
+        .minus({ hour: currentDate.getHours() })
+        .toISO()
+    );
+    const daysIntoMonth = currentDate.getDate() - 1;
+    const week = new Date(
+      luxon.DateTime.local(currentDate).minus({ days: 7 }).toISO()
+    );
+    const month = new Date(
+      luxon.DateTime.local(currentDate).minus({ days: daysIntoMonth }).toISO()
+    );
+    const halfYearly = new Date(
+      luxon.DateTime.local(currentDate).minus({
+        days: daysIntoMonth,
+        months: 6,
+      })
+    );
+    console.log(month);
+    const data = await Options.aggregate([
+      {
+        $facet: {
+          overView: ,
+        },
+      },
+    ]);
+    res.status(200).json({
+      message: "sucess",
+      data,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({
+      status: "failed",
+      message: e,
+    });
+  }
+};
+// {
+//   $match: {
+//     user: req.user._id,
+//   },
+// },
+// {
+//   $group: {
+//     _id: "Stats",
+//     netPLDay: {
+//       $sum: {
+//         $cond: [
+//           {
+//             $and: [
+//               {
+//                 $gte: ["$tradeCreatedOn", day],
+//               },
+//             ],
+//           },
+//           {
+//             $sum: "$netProfitLoss",
+//           },
+//           null,
+//         ],
+//       },
+//     },
+//     netPLWeek: {
+//       $sum: {
+//         $cond: [
+//           {
+//             $and: [{ $gte: ["$tradeCreatedOn", week] }],
+//           },
+//           { $sum: "$netProfitLoss" },
+//           null,
+//         ],
+//       },
+//     },
+//     netPLMonth: {
+//       $sum: {
+//         $cond: [
+//           {
+//             $gte: ["$tradeCreatedOn", month],
+//           },
+//           {
+//             $sum: "$netProfitLoss",
+//           },
+//           null,
+//         ],
+//       },
+//     },
+//     netPLSixMonths: {
+//       $sum: {
+//         $cond: [
+//           {
+//             $gte: ["$tradeCreatedOn", halfYearly],
+//           },
+//           {
+//             $sum: "$netProfitLoss",
+//           },
+//           null,
+//         ],
+//       },
+//     },
+//     netPLInTotal: { $sum: "$netProfitLoss" },
+//   },
+// },

@@ -11,4 +11,9 @@ router.patch(
   optionsController.updateClosingLeg
 );
 router.get("/:id", authController.protect, optionsController.getSingleOption);
+router.post(
+  "/get-analytics",
+  authController.protect,
+  optionsController.getAnalytics
+);
 module.exports = router;

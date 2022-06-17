@@ -17,7 +17,11 @@ const optionsSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  netProfitLoss: { type: Number },
+  tradeCreatedOn: {
+    type: Date,
+    default: Date.now(),
+  },
+  netProfitLoss: { type: Number, default: 0 },
   leg: [
     {
       expireDate: { type: Date, required: true },

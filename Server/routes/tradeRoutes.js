@@ -2,67 +2,12 @@ const express = require("express");
 const tradeControllers = require("./../controllers/tradeControllers");
 const authController = require("./../controllers/authController");
 const multer = require("multer");
-/**
- * @swagger
- * /
- *  get:
- *    summary : This endpoint is to get all the trades.
- *    description : Use to request all the trades.
- *    responses :
- *        200:
- *            description : To test the get method
- *
- */
+const saltedMd5 = require("salted-md5");
+const path = require("path");
+const admin = require("firebase-admin");
 
-/**
- * @swagger
- * /:
- *  post:
- *    summary : This endpoint is to create new trades.
- *    description : expecting data in the format.
- *    parameters: [stockTicker : string]
- *    responses :
- *        201:
- *            description : To test the post method
- *
- */
-/**
- * @swagger
- * /id:
- *  patch:
- *    summary : This endpoint is to update trades.
- *    description : expecting data in the format.
- *
- *    responses :
- *        202:
- *            description : To test the patch method
- *
- */
-
-/**
- * @swagger
- * /id:
- *  delete:
- *    summary : This endpoint is to delete trades.
- *    description : enter add the trade id.
- *
- *    responses :
- *        203:
- *            description : To test the delete method
- *
- */
-/**--++
- * @swagger
- * /id:
- *  get:
- *    summary : This endpoint is get a single trade.
- *    description : expecting data in the format.
- *
- *    responses :
- *        200:
- *            description : To test the get method
- *
- */
+const upload = multer({ storage: multer.memoryStorage() });
+require("dotenv").config();
 
 const fileStorageEngine = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -72,8 +17,13 @@ const fileStorageEngine = multer.diskStorage({
     cb(null, `${Date.now()}__${file.originalname}`);
   },
 });
-const upload = multer({ storage: fileStorageEngine });
 
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   databaseURL: "https://fir-project-1-58a04.firebaseio.com",
+//   storageBucket: process.env.FIREBASE_BUCKET_URL,
+// });
+// app.locals.bucket = admin.storage().bucket();
 const router = express.Router();
 
 router
