@@ -21,6 +21,13 @@ const optionsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  closeDate: {
+    type: Date,
+  },
+  tags: {
+    type: [],
+    required: true,
+  },
   netProfitLoss: { type: Number, default: 0 },
   leg: [
     {
@@ -47,6 +54,10 @@ const optionsSchema = new mongoose.Schema({
       openDate: {
         type: Date,
         required: true,
+      },
+      closeDate: {
+        type: Date,
+        // default: Date.now(),
       },
 
       closingEntries: [
