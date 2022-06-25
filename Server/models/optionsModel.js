@@ -13,7 +13,10 @@ const optionsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  date: {
+  expireDate: {
+    type: Date,
+  },
+  openDate: {
     type: Date,
     required: true,
   },
@@ -21,11 +24,20 @@ const optionsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  netPremium: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
   closeDate: {
     type: Date,
   },
   tags: {
-    type: [],
+    type: Array,
+    required: true,
+  },
+  typeOfTrade: {
+    type: String,
     required: true,
   },
   netProfitLoss: { type: Number, default: 0 },
