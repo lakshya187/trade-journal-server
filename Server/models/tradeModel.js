@@ -60,6 +60,14 @@ const tradeSchema = new mongose.Schema(
       ref: "user",
       required: true,
     },
+    closingPriceCalculated: {
+      type: Number,
+      default: 0,
+    },
+    profitLoss: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -72,16 +80,7 @@ tradeSchema.pre("save", function (next) {
   this.currentHoldings = this.tradeQuantity;
   next();
 });
-//Calculating the closingPrice
-tradeSchema.virtual("closingPriceCalculated").get(function () {
-  let val = 0;
-  if (this.currentHoldings != 0) return;
-  this.closingEntries.forEach((el) => {
-    const { price, quantity } = el;
-    val += price * quantity;
-  });
-  return (this.closingPriceCalculated = val / this.tradeQuantity);
-});
+
 //populatinng the trader field
 tradeSchema.pre(/^find/, function (next) {
   this.populate({
@@ -89,12 +88,7 @@ tradeSchema.pre(/^find/, function (next) {
   });
   next();
 });
-// tradeSchema.plugin(require("mongoose-autopopulate"));
-tradeSchema.virtual("profitLoss").get(function () {
-  if (this.currentHoldings != 0) return;
-  return (this.profitLoss =
-    (this.closingPriceCalculated - this.openPrice) * this.tradeQuantity);
-});
+
 const Trade = mongose.model("Trade", tradeSchema);
 
 module.exports = Trade;

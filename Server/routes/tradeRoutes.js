@@ -75,6 +75,10 @@ const fileStorageEngine = multer.diskStorage({
 const upload = multer({ storage: fileStorageEngine });
 
 const router = express.Router();
+
+router
+  .route("/getStats")
+  .get(authController.protect, tradeControllers.getStats);
 router.route("/updateClosing/:id").patch(tradeControllers.updateClosingEnties);
 router.post(
   "/uploadExcel",
