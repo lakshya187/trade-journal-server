@@ -485,6 +485,7 @@ exports.tradeProfitLossBasedOnPremium = async (req, res) => {
           },
         },
       },
+
       {
         $group: {
           _id: "Trades",
