@@ -22,7 +22,7 @@ exports.getAllOptions = async (req, res, next) => {
     });
   } catch (e) {
     console.log(e);
-    res.status(401).json({
+    res.status(400).json({
       status: "failed",
       message: e,
     });
@@ -61,23 +61,24 @@ exports.updateClosingLeg = async (req, res) => {
     const { data } = req.body;
     const closingDate = new Date(data.date);
     const leg = currentTrade.leg.find((l) => {
-      return (l.srtike = strike && l.optionType === optionType);
+      return l.strike === strike && l.optionType === optionType;
     });
+    if (!leg) {
+      throw new Error("Soemthing went wrong");
+    }
+    console.log(leg);
     data.totalQuantitySold = req.body.data.quantity * leg.lotSize;
     leg.closingEntries.push(data);
     //calculating closing price with each closing entry
     if (leg.currentHoldings === 0) {
       throw new Error("You cannot close anymore");
     }
-
     let val = 0;
-
     leg.closingEntries.forEach((e) => {
       val += e.premium * e.totalQuantitySold;
     });
     leg.closingPremium = val / leg.totalQuantity;
     leg.profitLoss = (leg.closingPremium - leg.premium) * leg.totalQuantity;
-
     const currHoldings = leg.currentHoldings - data.totalQuantitySold;
     leg.currentHoldings = currHoldings;
     let pAndL = 0;
@@ -86,8 +87,8 @@ exports.updateClosingLeg = async (req, res) => {
     });
     leg.closeDate = closingDate;
     currentTrade.netProfitLoss = pAndL;
-    console.log(leg);
-    // console.log(leg);
+
+    console.log(currentTrade);
 
     const updatedtrade = await currentTrade.save();
     res.status(200).json({ status: "success", updatedtrade });
@@ -99,7 +100,38 @@ exports.updateClosingLeg = async (req, res) => {
     });
   }
 };
-
+exports.updateClosingStrat = async (req, res) => {
+  try {
+    const { data } = req.body;
+    console.log(data);
+    const trade = await Options.findById(req.params.id);
+    let pl = 0;
+    trade.leg.forEach((l, i) => {
+      if (l.optionType === data[i].optionType && l.strike === data[i].strike) {
+        if (l.currentHoldings === 0) {
+          throw new Error("You cannot close anymore");
+        }
+        l.closingPremium = data[i].data.premium;
+        l.profitLoss = (l.closingPremium - l.premium) * l.lotSize * l.quantity;
+        l.currentHoldings = 0;
+        l.closeDate = data[i].data.date;
+        pl += l.profitLoss;
+        l.closingEntries.push(data[i].data);
+      }
+    });
+    trade.closeDate = data[0].data.date;
+    trade.netProfitLoss = pl;
+    console.log(trade);
+    const updatedTrade = await trade.save();
+    res.status(200).json({
+      status: "sucess",
+      message: "Trade updated sucesfully",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({ status: "failed", message: e });
+  }
+};
 exports.getSingleOption = async (req, res) => {
   try {
     const trade = await Options.findById(req.params.id);
@@ -118,12 +150,15 @@ exports.getSingleOption = async (req, res) => {
 
 exports.getAnalytics = async (req, res) => {
   try {
+    console.log("working");
     const currentDate = new Date(Date.now());
     const day = new Date(
       luxon.DateTime.local(currentDate)
         .minus({ hour: currentDate.getHours() })
         .toISO()
     );
+    console.log(day);
+
     const daysIntoMonth = currentDate.getDate() - 1;
     const week = new Date(
       luxon.DateTime.local(currentDate).minus({ days: 7 }).toISO()
@@ -137,7 +172,7 @@ exports.getAnalytics = async (req, res) => {
         months: 6,
       })
     );
-    console.log(day);
+    console.log(req.user._id);
     const data = await Options.aggregate([
       {
         $facet: {

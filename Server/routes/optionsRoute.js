@@ -8,6 +8,11 @@ router.patch(
   authController.protect,
   optionsController.updateClosingLeg
 );
+router.patch(
+  "/updateClosingStrat/:id",
+  authController.protect,
+  optionsController.updateClosingStrat
+);
 router.get(
   "/getProfitLossTypeOfTradeStrat",
   authController.protect,
