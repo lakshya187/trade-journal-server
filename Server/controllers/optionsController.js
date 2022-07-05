@@ -4,6 +4,7 @@ const Options = require("../models/optionsModel");
 const User = require("../models/userModel");
 const { months } = require("../utils/staticData");
 const mongoose = require("mongoose");
+const { DateTime } = require("luxon");
 
 exports.getAllOptions = async (req, res, next) => {
   try {
@@ -150,19 +151,19 @@ exports.getSingleOption = async (req, res) => {
 
 exports.getAnalytics = async (req, res) => {
   try {
-    console.log("working");
     const currentDate = new Date(Date.now());
+
     const day = new Date(
       luxon.DateTime.local(currentDate)
-        .minus({ hour: currentDate.getHours() })
+        .minus({ hours: luxon.DateTime.local().hour })
         .toISO()
     );
-    console.log(day);
 
-    const daysIntoMonth = currentDate.getDate() - 1;
+    const daysIntoMonth = luxon.DateTime.local().day;
     const week = new Date(
       luxon.DateTime.local(currentDate).minus({ days: 7 }).toISO()
     );
+
     const month = new Date(
       luxon.DateTime.local(currentDate).minus({ days: daysIntoMonth }).toISO()
     );
@@ -172,7 +173,9 @@ exports.getAnalytics = async (req, res) => {
         months: 6,
       })
     );
-    console.log(req.user._id);
+
+    console.log(month, daysIntoMonth);
+
     const data = await Options.aggregate([
       {
         $facet: {
@@ -184,19 +187,15 @@ exports.getAnalytics = async (req, res) => {
             },
             {
               $group: {
-                _id: "Stats",
+                _id: "overview",
                 totalTrades: {
                   $sum: 1,
                 },
-                netPLDay: {
+                profitLossDay: {
                   $sum: {
                     $cond: [
                       {
-                        $and: [
-                          {
-                            $gte: ["$tradeCreatedOn", day],
-                          },
-                        ],
+                        $gte: ["$tradeCreatedOn", day],
                       },
                       {
                         $sum: "$netProfitLoss",
@@ -205,13 +204,15 @@ exports.getAnalytics = async (req, res) => {
                     ],
                   },
                 },
-                netPLWeek: {
+                profitLossWeek: {
                   $sum: {
                     $cond: [
                       {
-                        $and: [{ $gte: ["$tradeCreatedOn", week] }],
+                        $gte: ["$tradeCreatedOn", week],
                       },
-                      { $sum: "$netProfitLoss" },
+                      {
+                        $sum: "$netProfitLoss",
+                      },
                       null,
                     ],
                   },
@@ -242,7 +243,6 @@ exports.getAnalytics = async (req, res) => {
                     ],
                   },
                 },
-                netPLInTotal: { $sum: "$netProfitLoss" },
               },
             },
           ],
@@ -271,12 +271,12 @@ exports.getAnalytics = async (req, res) => {
                 profitLoss: "$leg.profitLoss",
               },
             },
-            {
-              $group: {
-                _id: "Average Holding Period",
-                value: { $avg: "$heldDays" },
-              },
-            },
+            // {
+            //   $group: {
+            //     _id: "Average Holding Period",
+            //     value: { $avg: "$heldDays" },
+            //   },
+            // },
           ],
         },
       },
@@ -294,9 +294,18 @@ exports.getAnalytics = async (req, res) => {
   }
 };
 exports.getDataMonth = async (req, res, next) => {
-  const start = new Date(req.body.start);
-  const end = new Date(req.body.end);
-
+  // const start = new Date(req.body.start);
+  // const end = new Date(req.body.end);
+  const currentDate = new Date(Date.now());
+  const monthsToSub = currentDate.getMonth();
+  const daysTOSub = luxon.DateTime.local(currentDate).day - 1;
+  const start = new Date(
+    luxon.DateTime.local(currentDate)
+      .minus({ months: monthsToSub, days: daysTOSub })
+      .toISO()
+  );
+  const end = new Date(Date.now());
+  console.log(start, end);
   try {
     const data = await Options.aggregate([
       {
@@ -467,7 +476,7 @@ exports.getDataCustom = async (req, res) => {
       },
     ]);
     const modData = data.map((el) => {
-      el._id.month = months[el._id.month];
+      el._id.month = months[el._id.month - 1];
       return el;
     });
     res.status(200).json({

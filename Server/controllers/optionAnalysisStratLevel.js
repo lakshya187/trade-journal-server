@@ -32,11 +32,11 @@ exports.getProfitLossPremium = async (req, res) => {
           },
         },
       },
-      {
-        $group: {
-          _id: "$profitLoss",
-        },
-      },
+      // {
+      //   $group: {
+      //     _id: "$profitLoss",
+      //   },
+      // },
     ]);
     res.status(200).json({
       status: "sucess",
