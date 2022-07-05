@@ -72,11 +72,7 @@ userSchema.methods.compareTimestamps = function (jwtTimeStamp) {
 userSchema.methods.checkPasswords = async function (reqPassword, userPassword) {
   return await bycrypt.compare(reqPassword, userPassword);
 };
-// userSchema.pre("find", function (next) {
-//   console.log("working");
-//   this.populate("allTrades");
-//   next();
-// });
+
 const User = mongoose.model("user", userSchema);
 
 module.exports = User;

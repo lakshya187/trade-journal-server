@@ -4,6 +4,7 @@ const Options = require("../models/optionsModel");
 const User = require("../models/userModel");
 const { months } = require("../utils/staticData");
 const mongoose = require("mongoose");
+const { DateTime } = require("luxon");
 
 exports.getAllOptions = async (req, res, next) => {
   try {
@@ -22,7 +23,7 @@ exports.getAllOptions = async (req, res, next) => {
     });
   } catch (e) {
     console.log(e);
-    res.status(401).json({
+    res.status(400).json({
       status: "failed",
       message: e,
     });
@@ -61,23 +62,24 @@ exports.updateClosingLeg = async (req, res) => {
     const { data } = req.body;
     const closingDate = new Date(data.date);
     const leg = currentTrade.leg.find((l) => {
-      return (l.srtike = strike && l.optionType === optionType);
+      return l.strike === strike && l.optionType === optionType;
     });
+    if (!leg) {
+      throw new Error("Soemthing went wrong");
+    }
+    console.log(leg);
     data.totalQuantitySold = req.body.data.quantity * leg.lotSize;
     leg.closingEntries.push(data);
     //calculating closing price with each closing entry
     if (leg.currentHoldings === 0) {
       throw new Error("You cannot close anymore");
     }
-
     let val = 0;
-
     leg.closingEntries.forEach((e) => {
       val += e.premium * e.totalQuantitySold;
     });
     leg.closingPremium = val / leg.totalQuantity;
     leg.profitLoss = (leg.closingPremium - leg.premium) * leg.totalQuantity;
-
     const currHoldings = leg.currentHoldings - data.totalQuantitySold;
     leg.currentHoldings = currHoldings;
     let pAndL = 0;
@@ -86,8 +88,8 @@ exports.updateClosingLeg = async (req, res) => {
     });
     leg.closeDate = closingDate;
     currentTrade.netProfitLoss = pAndL;
-    console.log(leg);
-    // console.log(leg);
+
+    console.log(currentTrade);
 
     const updatedtrade = await currentTrade.save();
     res.status(200).json({ status: "success", updatedtrade });
@@ -99,7 +101,38 @@ exports.updateClosingLeg = async (req, res) => {
     });
   }
 };
-
+exports.updateClosingStrat = async (req, res) => {
+  try {
+    const { data } = req.body;
+    console.log(data);
+    const trade = await Options.findById(req.params.id);
+    let pl = 0;
+    trade.leg.forEach((l, i) => {
+      if (l.optionType === data[i].optionType && l.strike === data[i].strike) {
+        if (l.currentHoldings === 0) {
+          throw new Error("You cannot close anymore");
+        }
+        l.closingPremium = data[i].data.premium;
+        l.profitLoss = (l.closingPremium - l.premium) * l.lotSize * l.quantity;
+        l.currentHoldings = 0;
+        l.closeDate = data[i].data.date;
+        pl += l.profitLoss;
+        l.closingEntries.push(data[i].data);
+      }
+    });
+    trade.closeDate = data[0].data.date;
+    trade.netProfitLoss = pl;
+    console.log(trade);
+    const updatedTrade = await trade.save();
+    res.status(200).json({
+      status: "sucess",
+      message: "Trade updated sucesfully",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({ status: "failed", message: e });
+  }
+};
 exports.getSingleOption = async (req, res) => {
   try {
     const trade = await Options.findById(req.params.id);
@@ -119,15 +152,18 @@ exports.getSingleOption = async (req, res) => {
 exports.getAnalytics = async (req, res) => {
   try {
     const currentDate = new Date(Date.now());
+
     const day = new Date(
       luxon.DateTime.local(currentDate)
-        .minus({ hour: currentDate.getHours() })
+        .minus({ hours: luxon.DateTime.local().hour })
         .toISO()
     );
-    const daysIntoMonth = currentDate.getDate() - 1;
+
+    const daysIntoMonth = luxon.DateTime.local().day;
     const week = new Date(
       luxon.DateTime.local(currentDate).minus({ days: 7 }).toISO()
     );
+
     const month = new Date(
       luxon.DateTime.local(currentDate).minus({ days: daysIntoMonth }).toISO()
     );
@@ -137,7 +173,9 @@ exports.getAnalytics = async (req, res) => {
         months: 6,
       })
     );
-    console.log(day);
+
+    console.log(month, daysIntoMonth);
+
     const data = await Options.aggregate([
       {
         $facet: {
@@ -149,19 +187,15 @@ exports.getAnalytics = async (req, res) => {
             },
             {
               $group: {
-                _id: "Stats",
+                _id: "overview",
                 totalTrades: {
                   $sum: 1,
                 },
-                netPLDay: {
+                profitLossDay: {
                   $sum: {
                     $cond: [
                       {
-                        $and: [
-                          {
-                            $gte: ["$tradeCreatedOn", day],
-                          },
-                        ],
+                        $gte: ["$tradeCreatedOn", day],
                       },
                       {
                         $sum: "$netProfitLoss",
@@ -170,13 +204,15 @@ exports.getAnalytics = async (req, res) => {
                     ],
                   },
                 },
-                netPLWeek: {
+                profitLossWeek: {
                   $sum: {
                     $cond: [
                       {
-                        $and: [{ $gte: ["$tradeCreatedOn", week] }],
+                        $gte: ["$tradeCreatedOn", week],
                       },
-                      { $sum: "$netProfitLoss" },
+                      {
+                        $sum: "$netProfitLoss",
+                      },
                       null,
                     ],
                   },
@@ -207,7 +243,6 @@ exports.getAnalytics = async (req, res) => {
                     ],
                   },
                 },
-                netPLInTotal: { $sum: "$netProfitLoss" },
               },
             },
           ],
@@ -236,12 +271,12 @@ exports.getAnalytics = async (req, res) => {
                 profitLoss: "$leg.profitLoss",
               },
             },
-            {
-              $group: {
-                _id: "Average Holding Period",
-                value: { $avg: "$heldDays" },
-              },
-            },
+            // {
+            //   $group: {
+            //     _id: "Average Holding Period",
+            //     value: { $avg: "$heldDays" },
+            //   },
+            // },
           ],
         },
       },
@@ -259,9 +294,18 @@ exports.getAnalytics = async (req, res) => {
   }
 };
 exports.getDataMonth = async (req, res, next) => {
-  const start = new Date(req.body.start);
-  const end = new Date(req.body.end);
-
+  // const start = new Date(req.body.start);
+  // const end = new Date(req.body.end);
+  const currentDate = new Date(Date.now());
+  const monthsToSub = currentDate.getMonth();
+  const daysTOSub = luxon.DateTime.local(currentDate).day - 1;
+  const start = new Date(
+    luxon.DateTime.local(currentDate)
+      .minus({ months: monthsToSub, days: daysTOSub })
+      .toISO()
+  );
+  const end = new Date(Date.now());
+  console.log(start, end);
   try {
     const data = await Options.aggregate([
       {
@@ -432,7 +476,7 @@ exports.getDataCustom = async (req, res) => {
       },
     ]);
     const modData = data.map((el) => {
-      el._id.month = months[el._id.month];
+      el._id.month = months[el._id.month - 1];
       return el;
     });
     res.status(200).json({
@@ -485,6 +529,7 @@ exports.tradeProfitLossBasedOnPremium = async (req, res) => {
           },
         },
       },
+
       {
         $group: {
           _id: "Trades",

@@ -66,6 +66,7 @@ exports.login = async (req, res, next) => {
 
 exports.protect = async (req, res, next) => {
   try {
+    console.log("working");
     // 1) Checking if the token is present insdie the header
     let token = "";
     if (
@@ -94,7 +95,7 @@ exports.protect = async (req, res, next) => {
     req.user = currentUser;
     next();
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     res.status(401).json({
       status: "failed",
       message: err,
@@ -104,9 +105,6 @@ exports.protect = async (req, res, next) => {
 
 exports.authorize = async (req, res) => {
   try {
-    // console.log(req.headers);
-    // console.log("working");
-    // console.log(req.headers);
     //1) Check if the token exsists insdie the header
     let token = "";
     if (
@@ -140,7 +138,7 @@ exports.authorize = async (req, res) => {
       user,
     });
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     res.status(401).json({
       status: "Failed",
       message: "invailed token",

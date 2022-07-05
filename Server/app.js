@@ -9,7 +9,6 @@ const multer = require("multer");
 const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
 const userRouter = require("./routes/userRoute");
 const optionsRouter = require("./routes/optionsRoute");
-const req = require("express/lib/request");
 
 const app = express();
 app.use(express.json());
