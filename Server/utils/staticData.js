@@ -12,3 +12,12 @@ exports.months = [
   "Nov",
   "Dec",
 ];
+exports.day = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];

@@ -8,6 +8,11 @@ router.patch(
   authController.protect,
   optionsController.updateClosingLeg
 );
+router.get(
+  "/getDataDayOfMonth",
+  authController.protect,
+  optionsController.getDataDayOfMonth
+);
 router.patch(
   "/updateClosingStrat/:id",
   authController.protect,
@@ -17,6 +22,11 @@ router.get(
   "/getProfitLossTypeOfTradeStrat",
   authController.protect,
   optionsStratLevelAnalysis.getProfitLossTypeOfTrade
+);
+router.get(
+  "/getDataDayOfMonth",
+  authController.protect,
+  optionsController.getDataDayOfMonth
 );
 router.get(
   "/getProfitLossExpire",

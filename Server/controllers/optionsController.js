@@ -5,7 +5,7 @@ const User = require("../models/userModel");
 const { months } = require("../utils/staticData");
 const mongoose = require("mongoose");
 const { DateTime } = require("luxon");
-
+const { day } = require("../utils/staticData");
 exports.getAllOptions = async (req, res, next) => {
   try {
     const options = await User.findById(req.user.id).populate({
@@ -305,7 +305,6 @@ exports.getDataMonth = async (req, res, next) => {
       .toISO()
   );
   const end = new Date(Date.now());
-  console.log(start, end);
   try {
     const data = await Options.aggregate([
       {
@@ -334,14 +333,18 @@ exports.getDataMonth = async (req, res, next) => {
       },
       {
         $group: {
-          _id: { month: "$month" },
+          _id: "$month",
           netProfitLoss: { $sum: "$netProfitLoss" },
         },
       },
     ]);
+    const modData = data.sort((a, b) => {
+      return a._id - b._id;
+    });
+
     res.status(200).json({
       status: "Sucess",
-      data,
+      modData,
     });
   } catch (e) {
     console.log(e);
@@ -399,6 +402,15 @@ exports.getDataYear = async (req, res) => {
 exports.getDataWeekly = async (req, res) => {
   try {
     const start = new Date(req.body.start);
+    // const daysIntoWeek = luxon.DateTime.local();
+    const daysIntoWeek = new Date(Date.now()).getDay();
+    const week = new Date(
+      luxon.DateTime.local(luxon.DateTime.local())
+        .minus({ days: daysIntoWeek })
+        .toISO()
+    );
+
+    console.log(week.setHours(0, 0, 0, 0));
 
     const data = await Options.aggregate([
       {
@@ -409,7 +421,7 @@ exports.getDataWeekly = async (req, res) => {
             },
             {
               tradeCreatedOn: {
-                $gte: start,
+                $gte: week,
               },
             },
           ],
@@ -423,16 +435,79 @@ exports.getDataWeekly = async (req, res) => {
       },
       {
         $group: {
-          _id: { day: "$day" },
+          _id: "$day",
           netProfitLoss: { $sum: "$netProfitLoss" },
         },
       },
     ]);
+    console.log(day);
+    const modData = data.sort((a, b) => {
+      // a.day = day[a._id - 1];
+      return a._id - b._id;
+    });
+
     res.status(200).json({
       message: "sucess",
-      data,
+      modData,
     });
   } catch (e) {
+    console.log(e);
+    res.status(400).json({
+      status: "failed",
+      message: e,
+    });
+  }
+};
+exports.getDataDayOfMonth = async (req, res) => {
+  try {
+    const daysIntoMonth = luxon.DateTime.local().day;
+    const month = new Date(
+      luxon.DateTime.local().minus({ days: daysIntoMonth })
+    );
+    // const userId = ObjectId.fromString( myObjectIdString );
+    console.log(req.user._id);
+    // console.log(month);
+    const data = await Options.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              user: req.user._id,
+            },
+            {
+              tradeCreatedOn: {
+                $gte: month,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          dayOfTheMonth: { $dayOfMonth: "$tradeCreatedOn" },
+          month: { $month: "$tradeCreatedOn" },
+          netProfitLoss: 1,
+          tradeCreatedOn: 1,
+        },
+      },
+      {
+        $group: {
+          _id: { day: "$dayOfTheMonth", m: "$month" },
+          netProfitLoss: { $sum: "$netProfitLoss" },
+        },
+      },
+    ]);
+    const modData = data.sort((a, b) => {
+      console.log(a);
+      return a._id.day - b._id.day;
+    });
+    console.log(modData);
+    res.status(200).json({
+      status: "success",
+      modData,
+    });
+  } catch (e) {
+    console.log(e);
     res.status(400).json({
       status: "failed",
       message: e,
@@ -463,21 +538,22 @@ exports.getDataCustom = async (req, res) => {
       },
       {
         $project: {
-          year: { $year: "$tradeCreatedOn" },
-          month: { $month: "$tradeCreatedOn" },
+          tradeCreatedOn: 1,
           netProfitLoss: 1,
         },
       },
       {
         $group: {
-          _id: { year: "$year", month: "$month" },
+          _id: "$tradeCreatedOn",
           netProfitLoss: { $sum: "$netProfitLoss" },
         },
       },
     ]);
-    const modData = data.map((el) => {
-      el._id.month = months[el._id.month - 1];
-      return el;
+    const modData = data.sort((a, b) => {
+      const dateA = new Date(a._id);
+      console.log(dateA);
+      const dateB = new Date(b._id);
+      return dateA - dateB;
     });
     res.status(200).json({
       status: "sucess",
