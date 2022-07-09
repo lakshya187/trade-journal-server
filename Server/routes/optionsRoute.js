@@ -13,6 +13,11 @@ router.get(
   authController.protect,
   optionsController.getDataDayOfMonth
 );
+router.get(
+  "/getOptionStrategies",
+  authController.protect,
+  optionsController.getStratNames
+);
 router.patch(
   "/updateClosingStrat/:id",
   authController.protect,
@@ -86,6 +91,16 @@ router.post(
   "/getProfitLossPremiumStrat",
   authController.protect,
   optionsStratLevelAnalysis.getProfitLossPremium
+);
+router.post(
+  "/findTradesByUnderlying",
+  authController.protect,
+  optionsController.findTradesByTicker
+);
+router.post(
+  "/strategyFilter",
+  authController.protect,
+  optionsController.strategyFilter
 );
 
 module.exports = router;

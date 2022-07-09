@@ -66,7 +66,6 @@ exports.login = async (req, res, next) => {
 
 exports.protect = async (req, res, next) => {
   try {
-    console.log("working");
     // 1) Checking if the token is present insdie the header
     let token = "";
     if (
