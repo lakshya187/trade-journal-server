@@ -13,7 +13,7 @@ exports.getAllOptions = async (req, res, next) => {
       options: {
         sort: { openDate: -1 },
         skip: 0,
-        limit: 100,
+        limit: 10,
       },
       match: {},
     });
@@ -726,6 +726,146 @@ exports.getDataBasedOnHoldingPeriod = async (req, res) => {
       },
     ]);
     res.status(200).json({ status: "sucess", data });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({
+      status: "failed",
+      message: e,
+    });
+  }
+};
+
+exports.findTradesByTicker = async (req, res) => {
+  try {
+    const query = req.body.underlying;
+    query.trim();
+    // console.log(underlying);
+    // const data = await Options.aggregate([
+    //   {
+    //     $match: {
+    //       $and: [
+    //         { user: req.user._id },
+    //         { underlying: {$regex} },
+    //       ],
+    //     },
+    //   },
+    // ]);
+    const rawData = await Options.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+        },
+      },
+      {
+        $addFields: {
+          match: {
+            $regexMatch: { input: "$underlying", regex: query, options: "i" },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$match",
+          result: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+    ]);
+    const resultObj = rawData.find((el) => {
+      return el._id === true;
+    });
+    const data = resultObj.result;
+    console.log(data);
+    res.status(200).json({
+      status: "success",
+      data,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({
+      status: "failed",
+      message: e,
+    });
+  }
+};
+
+exports.getStratNames = async (req, res) => {
+  try {
+    const rawData = await Options.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+        },
+      },
+      {
+        $project: {
+          strategyName: 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$strategyName",
+        },
+      },
+    ]);
+    const data = rawData.map((el) => {
+      return {
+        label: el._id,
+        value: el._id,
+      };
+    });
+
+    res.status(200).json({
+      status: "Success",
+      data,
+    });
+  } catch (e) {
+    res.status(400).json({
+      message: e,
+      status: "success",
+    });
+  }
+};
+
+exports.strategyFilter = async (req, res) => {
+  try {
+    const { query } = req.body;
+    const rawData = await Options.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+        },
+      },
+      {
+        $addFields: {
+          match: {
+            $regexMatch: {
+              input: "$strategyName",
+              regex: query,
+              options: "i",
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$match",
+          results: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+    ]);
+    const resultObj = rawData.find((el) => {
+      return el._id === true;
+    });
+
+    const data = resultObj.results;
+    res.status(200).json({
+      status: "success",
+      data,
+    });
   } catch (e) {
     console.log(e);
     res.status(400).json({
