@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+
+    <style>
+      table,
+      td,
+      div,
+      h1,
+      p {
+        font-family: Arial, sans-serif;
+      }
+      body {
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .optionsDashboardContainer {
+        display: flex;
+      }
+      .optionsDashbardLeft {
+        flex: 0.1;
+      }
+      .optionsDashbardCenter {
+        flex: 0.7;
+        padding: 0px 30px;
+      }
+      .optionsDashbardRight {
+        flex: 0.1;
+      }
+      .optionsDashboardHeadingContainer {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .optionsDashboardHeadingContainer button {
+        margin-left: 20px;
+      }
+      .dashboardFiltersContainer {
+        display: flex;
+        align-items: center;
+      }
+      .dashboardContainer {
+        display: flex;
+      }
+
+      .dashboardLeft {
+        flex: 0.1;
+      }
+      .dashboardCenter {
+        padding: 0 30px;
+        flex: 0.6;
+      }
+      .dashboardRight {
+        flex: 0.3;
+      }
+      .dashboardGreeting {
+        font-size: 32px;
+        color: #2d2d2d;
+      }
+      .dashboardAddNewTrades {
+        display: flex;
+        margin-top: 20px;
+        justify-content: space-around;
+      }
+      .dashboardAddNewTradesItem {
+        height: 150px;
+        width: 180px;
+        display: flex;
+        flex-direction: column;
+        /* justify-content: ; */
+        justify-content: space-around;
+        align-items: flex-start;
+        padding: 20px;
+        border-radius: 5px;
+        color: #2d2d2d;
+        /* margin-left: 20px; */
+      }
+      .dashboardAddNewTradesItem img {
+        width: 20%;
+      }
+      .dashboardAddNewTradesItem:hover {
+        cursor: pointer;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+        color: #2d2d2d;
+      }
+      .dashboardTradesEquityContainer h1 {
+        font-size: 32px;
+        color: #2d2d2d;
+        margin-top: 20px;
+      }
+      .tradeCardContainer {
+        display: flex;
+        border-top: 1px solid #c0c0c0;
+        padding: 30px 0;
+        align-items: center;
+        justify-content: center;
+      }
+      .tradeCardType {
+        height: 70px;
+        width: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-right: 20px;
+      }
+      .textMain {
+        padding: 0px 20px 0 0;
+        color: #c0c0c0;
+      }
+      .textValue {
+        color: #2d2d2d;
+        font-weight: bold;
+      }
+
+      .dashboardCardText {
+        display: flex;
+        align-items: center;
+        /* flex-direction: row; */
+      }
+      .tickerName {
+        padding: 0 50px 0 0;
+      }
+      .dashboardStatisticsContainer {
+        background-color: #f7f7f7;
+        padding: 0px 20px;
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        border-radius: 10px;
+      }
+      .dashboardRight {
+        margin-left: 50px;
+      }
+      .dashboardStatsItem {
+        display: flex;
+        padding: 10px 0px 10px 30px;
+        margin-top: 20px;
+        background-color: #fff;
+        align-items: center;
+      }
+      .dashboardStatsBullet {
+        height: 10px;
+        width: 10px;
+        background-color: #2d2d2d;
+        margin-right: 20px;
+        border-radius: 2px;
+      }
+      .dashboardStatsDescription {
+        color: #c0c0c0;
+        font-size: 14px;
+      }
+      .dashboardStatsValue {
+        color: #2d2d2d;
+        font-weight: bold;
+        margin-left: 5px;
+      }
+      .arrowDropDown:hover {
+        cursor: pointer;
+      }
+      .arrowDropDownRight {
+        transform: rotate(-90deg);
+      }
+      .closeEntriesShow:hover {
+        cursor: pointer;
+      }
+      .dashboardInsight {
+        height: 300px;
+        width: 300px;
+      }
+      .dashboardFiltersContainer {
+        display: flex;
+      }
+      .tradeCardTypeStrategy {
+        height: 70px;
+        width: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-right: 20px;
+        background-color: #2d2d2d;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body style="margin: 0; padding: 0">
+    <div class="tradeCard">
+      <div class="tradeCardContainer">
+        <div class="tradeCardTypeStrategy">{{typeOfTrade}}</div>
+        <div class="dashboardCardText">
+          <p class="textMain cardField tickerName">
+            <span class="textValue">
+              {{ticker}}
+              <br />
+            </span>
+            Stock Ticker
+          </p>
+          <p class="textMain cardField">
+            <span class="textValue">
+              {{strategyName}}
+              <br />
+            </span>
+            Strategy Name
+          </p>
+          <p class="textMain cardField">
+            <span class="textValue">
+              {{expireDate}}
+              <br />
+            </span>
+            Expire Date
+          </p>
+          <p class="textMain cardField">
+            <span class="textValue"> ${{netPremium}} <br /> </span>
+            Premium
+          </p>
+
+          <p class="textMain cardField">
+            <span class="textValue">{{legLength}}</span>
+            <br />
+            Number of legs
+          </p>
+          <p class="textMain">
+            <span class="textValue textMain">
+              ${{netProfitLoss}}
+              <br />
+            </span>
+            M - M
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

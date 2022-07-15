@@ -3,6 +3,7 @@ const app = require(`${__dirname}/app`);
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 app.use(morgan("dev"));
+
 dotenv.config({ path: `${__dirname}/config.env` });
 //The connect string responsible to establish connection between mongoDB and the code.
 mongoose
