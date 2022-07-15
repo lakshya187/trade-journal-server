@@ -177,7 +177,10 @@ exports.tweetImage = async (req, res) => {
     res.status(200).json({
       status: "success",
     });
-    res.send(rawImage);
+    // res.send(rawImage);
+    res.status(200).json({
+      status: "success",
+    });
   } catch (e) {
     console.log(e);
     res.status(400).json({
