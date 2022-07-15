@@ -125,7 +125,7 @@ exports.updateClosingStrat = async (req, res) => {
     console.log(trade);
     const updatedTrade = await trade.save();
     res.status(200).json({
-      status: "sucess",
+      status: "success",
       message: "Trade updated sucesfully",
     });
   } catch (e) {
@@ -137,7 +137,7 @@ exports.getSingleOption = async (req, res) => {
   try {
     const trade = await Options.findById(req.params.id);
     res.status(200).json({
-      message: "sucess",
+      message: "success",
       data: trade,
     });
   } catch (e) {
