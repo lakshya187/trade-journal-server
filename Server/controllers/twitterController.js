@@ -162,6 +162,7 @@ exports.tweetImage = async (req, res) => {
     const rawImage = await htmlToImage({
       output: "../temp/imageOne",
       html: html,
+      puppeteerArgs: { args: ["--no-sandbox"] },
     });
     const image = Buffer.from(rawImage, "base64");
 
