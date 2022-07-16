@@ -27,6 +27,7 @@
     "node-html-to-image": "^3.2.4",
     "path": "^0.12.7",
     "puppeteer": "^15.4.0",
+    "puppeteer-core": "^15.4.0",
     "salted-md5": "^4.0.2",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.3.0",
