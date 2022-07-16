@@ -52,6 +52,9 @@
   "bugs": {
     "url": "https://github.com/lakshya187/Trade-Journal/issues"
   },
- 
+  "engines": {
+    "node": "16.15.1",
+    "npm": "8.1.2"
+  },
   "homepage": "https://github.com/lakshya187/Trade-Journal#readme"
 }
