@@ -31,6 +31,7 @@ const swaggerOptions = {
       servers: ["http://localhost:5000"],
     },
   },
+
   apis: ["./routes/tradeRoutes.js"],
 };
 
