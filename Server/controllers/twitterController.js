@@ -160,7 +160,7 @@ exports.tweetImage = async (req, res) => {
     };
     const html = createHtmlForTemplate("tweet.html", details);
     const rawImage = await htmlToImage({
-      output: "./image.png",
+      output: "../temp/imageOne",
       html: html,
     });
     const image = Buffer.from(rawImage, "base64");
