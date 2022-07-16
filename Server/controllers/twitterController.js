@@ -1,24 +1,13 @@
-const uuid = require("uuid");
 const crypto = require("crypto");
 const jsSHA = require("jssha/dist/sha1");
 const axios = require("axios");
-const imageToBase64 = require("image-to-base64");
+
 const fs = require("fs");
 const base64 = require("base-64");
 const twitter = require("twitter");
-const { render } = require("../app");
-const handlebars = require("express-handlebars");
 const createHtmlForTemplate = require("../utils/template");
 const Options = require("../models/optionsModel");
 const htmlToImage = require("node-html-to-image");
-
-const generateBase64Image = () => {
-  try {
-    return imageData;
-  } catch (e) {
-    console.log(e);
-  }
-};
 
 const sortString = (requiredParameters, endpoint) => {
   let base_signature_string = "POST&" + encodeURIComponent(endpoint) + "&";
