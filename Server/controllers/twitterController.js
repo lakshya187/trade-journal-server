@@ -148,7 +148,7 @@ exports.tweetImage = async (req, res) => {
     });
     console.log(id);
     const trade = await Options.findById(id);
-    console.log(trade);
+
     const details = {
       ticker: trade.ticker,
       strategyName: trade.strategyName,
