@@ -31,17 +31,25 @@ exports.getAllOptions = async (req, res, next) => {
 };
 exports.createOptionTrades = async (req, res) => {
   try {
+    // console.log(req.body);
+
     if (!req.body.user) {
       req.body.user = req.user.id;
     }
+    let netPremiumStratLevel = 0;
     req.body.leg.forEach((l, i) => {
       l.currentHoldings = l.quantity * l.lotSize;
+      if (l.typeOfTrade === "short") {
+        l.premium = -l.premium;
+      }
+      netPremiumStratLevel += l.premium;
     });
+    req.body.netPremium = netPremiumStratLevel;
     console.log(req.body);
-    const newOptionsTrade = await Options.create(req.body);
+    // const newOptionsTrade = await Options.create(req.body);
     res.status(201).json({
       status: "success",
-      data: newOptionsTrade,
+      // data: newOptionsTrade,
     });
   } catch (e) {
     console.log(e);
