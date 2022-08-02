@@ -42,14 +42,20 @@ exports.createOptionTrades = async (req, res) => {
       if (l.typeOfTrade === "short") {
         l.premium = -l.premium;
       }
-      netPremiumStratLevel += l.premium;
+      netPremiumStratLevel += l.premium * l.quantity * l.lotSize;
     });
     req.body.netPremium = netPremiumStratLevel;
+    req.body.netPremium > 0
+      ? (req.body.typeOfTrade = "long")
+      : (req.body.typeOfTrade = "short");
     console.log(req.body);
-    // const newOptionsTrade = await Options.create(req.body);
+    // if(req.body.typeOfTrade > 0) {
+    //   req.body.typeOfTrade =
+    // }
+    const newOptionsTrade = await Options.create(req.body);
     res.status(201).json({
       status: "success",
-      // data: newOptionsTrade,
+      data: newOptionsTrade,
     });
   } catch (e) {
     console.log(e);
