@@ -7,5 +7,10 @@ router.post("/sign-up", authController.signUp);
 router.post("/log-in", authController.login);
 router.post("/authorize", authController.authorize);
 
-router.get("/:id", userController.getSingleUser);
+router.get(
+  "/:id",
+  authController.protect,
+  authController.restrictTo("admin"),
+  userController.getSingleUser
+);
 module.exports = router;
