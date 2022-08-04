@@ -11,7 +11,13 @@ router.patch(
 router.get(
   "/getDataDayOfMonth",
   authController.protect,
+
   optionsController.getDataDayOfMonth
+);
+router.get(
+  "/profitLoss",
+  authController.protect,
+  optionsController.getProfitLoss
 );
 router.get(
   "/getOptionStrategies",
@@ -43,7 +49,12 @@ router.post(
   authController.protect,
   optionsController.getDataBasedOnHoldingPeriod
 );
-router.get("/", authController.protect, optionsController.getAllOptions);
+router.get(
+  "/",
+  authController.protect,
+  authController.restrictTo("trader", "admin"),
+  optionsController.getAllOptions
+);
 router.post("/", authController.protect, optionsController.createOptionTrades);
 
 router.get(
@@ -102,5 +113,10 @@ router.post(
   authController.protect,
   optionsController.strategyFilter
 );
-
+router.delete(
+  "/:id",
+  authController.protect,
+  authController.restrictTo("trader", "admin"),
+  optionsController.deleteTrade
+);
 module.exports = router;

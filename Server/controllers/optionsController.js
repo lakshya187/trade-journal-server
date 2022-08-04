@@ -6,6 +6,7 @@ const { months } = require("../utils/staticData");
 const mongoose = require("mongoose");
 const { DateTime } = require("luxon");
 const { day } = require("../utils/staticData");
+const Trade = require("../models/tradeModel");
 exports.getAllOptions = async (req, res, next) => {
   try {
     const options = await User.findById(req.user.id).populate({
@@ -753,17 +754,7 @@ exports.findTradesByTicker = async (req, res) => {
   try {
     const query = req.body.underlying;
     query.trim();
-    // console.log(underlying);
-    // const data = await Options.aggregate([
-    //   {
-    //     $match: {
-    //       $and: [
-    //         { user: req.user._id },
-    //         { underlying: {$regex} },
-    //       ],
-    //     },
-    //   },
-    // ]);
+
     const rawData = await Options.aggregate([
       {
         $match: {
@@ -885,6 +876,77 @@ exports.strategyFilter = async (req, res) => {
     res.status(400).json({
       status: "failed",
       message: e,
+    });
+  }
+};
+
+exports.deleteTrade = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedTrade = await Options.findByIdAndDelete(id);
+    console.log(deletedTrade);
+    res.status(200).json({
+      message: "success",
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "failed",
+      message: e,
+    });
+  }
+};
+
+exports.getProfitLoss = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    console.log(_id);
+    const data = await Options.aggregate([
+      {
+        $match: {
+          user: _id,
+        },
+      },
+      {
+        $group: {
+          _id: "Profit Loss",
+          profit: {
+            $sum: {
+              $cond: [
+                {
+                  $gt: ["$netProfitLoss", 0],
+                },
+                {
+                  $sum: "$netProfitLoss",
+                },
+                null,
+              ],
+            },
+          },
+          loss: {
+            $sum: {
+              $cond: [
+                {
+                  $lt: ["$netProfitLoss", 0],
+                },
+                {
+                  $sum: "$netProfitLoss",
+                },
+                null,
+              ],
+            },
+          },
+        },
+      },
+    ]);
+    res.status(200).json({
+      data,
+      status: "success",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({
+      message: e,
+      status: "failed",
     });
   }
 };

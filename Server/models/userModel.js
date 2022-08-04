@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: {
       type: Date,
     },
+    role: {
+      type: String,
+      default: "trader",
+      enum: ["admin", "trader"],
+    },
   },
   {
     toJSON: { virtuals: true },

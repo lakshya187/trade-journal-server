@@ -144,3 +144,21 @@ exports.authorize = async (req, res) => {
     });
   }
 };
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    try {
+      //check if the user has the  role required to access this route
+      if (!roles.includes(req.user.role)) {
+        throw new Error("You dont have the persmission");
+      }
+      next();
+    } catch (e) {
+      res.status(403).json({
+        status: "failed",
+        message: e,
+      });
+      console.log(e);
+    }
+  };
+};
