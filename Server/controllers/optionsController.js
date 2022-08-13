@@ -189,8 +189,6 @@ exports.getAnalytics = async (req, res) => {
       })
     );
 
-    console.log(month, daysIntoMonth);
-
     const data = await Options.aggregate([
       {
         $facet: {
