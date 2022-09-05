@@ -201,7 +201,7 @@ exports.uploadExcelTrades = async (req, res) => {
       return t;
     });
     console.log(modData);
-    // const newTrades = await Trade.insertMany(modData);
+    const newTrades = await Trade.insertMany(modData);
     fs.unlink(`${__dirname}/../excelUploads/${filename}`, (err) => {
       if (err) console.log(err);
       console.log(`${filename} succesfully parsed and removed.`);
