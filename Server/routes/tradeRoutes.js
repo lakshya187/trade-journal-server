@@ -6,7 +6,7 @@ const saltedMd5 = require("salted-md5");
 const path = require("path");
 const admin = require("firebase-admin");
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ dest: `${__dirname}/../excelUploads` });
 require("dotenv").config();
 
 const fileStorageEngine = multer.diskStorage({
@@ -18,12 +18,6 @@ const fileStorageEngine = multer.diskStorage({
   },
 });
 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-//   databaseURL: "https://fir-project-1-58a04.firebaseio.com",
-//   storageBucket: process.env.FIREBASE_BUCKET_URL,
-// });
-// app.locals.bucket = admin.storage().bucket();
 const router = express.Router();
 
 router

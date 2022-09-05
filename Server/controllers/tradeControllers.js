@@ -179,6 +179,8 @@ exports.uploadExcelTrades = async (req, res) => {
   try {
     const { _id } = req.user;
     const { filename } = req.file;
+    console.log(req.file);
+
     const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
     const sheetNames = workBook.SheetNames[0];
     const sheetValues = workBook.Sheets[sheetNames];
@@ -199,7 +201,12 @@ exports.uploadExcelTrades = async (req, res) => {
       return t;
     });
     console.log(modData);
-    const newTrades = await Trade.insertMany(modData);
+    // const newTrades = await Trade.insertMany(modData);
+    fs.unlink(`${__dirname}/../excelUploads/${filename}`, (err) => {
+      if (err) console.log(err);
+      console.log(`${filename} succesfully parsed and removed.`);
+    });
+
     res.status(201).json({
       status: "sucess",
     });
