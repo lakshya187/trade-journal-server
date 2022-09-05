@@ -300,8 +300,6 @@ exports.getMainDashboardStats = async (req, res) => {
         },
       },
     ]);
-    console.log(equity);
-    console.log(options);
     const data = {
       totalTrades: equity[0].totalTrades + options[0].totalTrades,
       netReturns: equity[0].netReturns + options[0].netReturns,

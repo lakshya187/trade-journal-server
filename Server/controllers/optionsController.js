@@ -356,7 +356,7 @@ exports.getDataMonth = async (req, res, next) => {
     });
 
     res.status(200).json({
-      status: "Sucess",
+      status: "Success",
       modData,
     });
   } catch (e) {
