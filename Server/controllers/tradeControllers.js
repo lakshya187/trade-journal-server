@@ -1,6 +1,7 @@
 const express = require("express");
 const xlsx = require("xlsx");
 const fs = require("fs");
+const axios = require("axios");
 
 const Trade = require(`./../models/tradeModel`);
 const User = require("./../models/userModel.js");
@@ -178,28 +179,44 @@ exports.updateCurrentHoldings = function (req, res) {
 exports.uploadExcelTrades = async (req, res) => {
   try {
     const { _id } = req.user;
-    const { filename } = req.file;
-    const workBook = xlsx.readFile(`${__dirname}/../excelUploads/${filename}`);
-    const sheetNames = workBook.SheetNames[0];
-    const sheetValues = workBook.Sheets[sheetNames];
-    const jsonData = xlsx.utils.sheet_to_json(sheetValues);
-    const modData = jsonData.map((t) => {
-      const tyoeOfTrade = t.tradeQuantity >= 0 ? "Long" : "Short";
-      t.typeOfTrade = tyoeOfTrade;
-      t.tradeQuantity = Math.abs(t.tradeQuantity);
-      t.currentHoldings = 0;
-      t.user = _id;
-      const closingEntry = { price: t.closePrice, quantity: t.tradeQuantity };
-      t.closingEntries = [];
-      t.closingEntries.push(closingEntry);
-      t.closingPriceCalculated = t.closePrice;
-      t.profitLoss = +((t.closePrice - t.openPrice) * t.tradeQuantity).toFixed(
-        2
-      );
-      return t;
+    // const { filename } = req.file;
+    const file = await axios.get(
+      `https://firebasestorage.googleapis.com/v0/b/trade-journal-ad965.appspot.com/o/excel-files-equity%2F626683ae8895262abfbd4a84_testFile.xlsx?alt=media&token=f1a4c655-7142-4147-93db-d93c0bede920`
+    );
+
+    // const workBook = xlsx.readFile(
+    //   `${__dirname}/../excelUploads/testFile.xlsx`
+    // );
+
+    const buff = new Buffer.from(file.data).toString("base64");
+    console.log(buff);
+    fs.writeFile("image.xlsx", buff, { encoding: "base64" }, function (err) {
+      console.log("File created");
     });
-    console.log(modData);
-    const newTrades = await Trade.insertMany(modData);
+    // const workBook = xlsx.read(buff, { type: "buffer" });
+    // console.log(workBook);
+    // const sheetNames = workBook.SheetNames[0];
+    // console.log(sheetNames);
+    // const sheetValues = workBook.Sheets[sheetNames];
+    // const jsonData = xlsx.utils.sheet_to_json(sheetValues);
+    // const modData = jsonData.map((t) => {
+    //   const tyoeOfTrade = t.tradeQuantity >= 0 ? "Long" : "Short";
+    //   t.typeOfTrade = tyoeOfTrade;
+    //   t.tradeQuantity = Math.abs(t.tradeQuantity);
+    //   t.currentHoldings = 0;
+    //   t.user = _id;
+    //   const closingEntry = { price: t.closePrice, quantity: t.tradeQuantity };
+    //   t.closingEntries = [];
+    //   t.closingEntries.push(closingEntry);
+    //   t.closingPriceCalculated = t.closePrice;
+    //   t.profitLoss = +((t.closePrice - t.openPrice) * t.tradeQuantity).toFixed(
+    //     2
+    //   );
+    //   return t;
+    // });
+    // console.log(modData);
+
+    // const newTrades = await Trade.insertMany(modData);
     res.status(201).json({
       status: "sucess",
     });
