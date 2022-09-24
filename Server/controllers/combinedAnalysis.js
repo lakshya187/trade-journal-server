@@ -172,11 +172,12 @@ exports.returns = async (req, res) => {
     ]);
     const equity = equityReturns[0];
     const options = optionsReturn[0];
+    console.log({ equity, options });
     const returns = {
       daily: equity.daily + options.daily,
       weekly: equity.weekly + options.weekly,
       monthly: equity.monthly + options.monthly,
-      yearly: equity.yearly + options.monthly,
+      yearly: equity.yearly + options.yearly,
     };
     res.status(200).json({
       status: "success",
@@ -316,6 +317,21 @@ exports.getMainDashboardStats = async (req, res) => {
   } catch (e) {
     res.status(400).json({
       status: "failed",
+    });
+  }
+};
+
+const riskRewardRatio = (req, res) => {
+  try {
+    //
+    res.status(200).json({
+      message: "success",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({
+      message: "failed",
+      e,
     });
   }
 };
