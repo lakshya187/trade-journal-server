@@ -14,4 +14,9 @@ router.get(
   protect,
   combinedAnalysis.getMainDashboardStats
 );
+router.get(
+  "/getAggregateRiskReward",
+  protect,
+  combinedAnalysis.riskRewardRatio
+);
 module.exports = router;

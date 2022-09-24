@@ -321,11 +321,103 @@ exports.getMainDashboardStats = async (req, res) => {
   }
 };
 
-const riskRewardRatio = (req, res) => {
+exports.riskRewardRatio = async (req, res) => {
   try {
-    //
+    const { _id } = req.user;
+    const equityData = await Equity.aggregate([
+      {
+        $match: { user: _id },
+      },
+      {
+        $project: {
+          loss: {
+            $sum: {
+              $cond: [
+                {
+                  $lt: ["$profitLoss", 0],
+                },
+                {
+                  $sum: "$profitLoss",
+                },
+                null,
+              ],
+            },
+          },
+          profit: {
+            $sum: {
+              $cond: [
+                {
+                  $gt: ["$profitLoss", 0],
+                },
+                {
+                  $sum: "$profitLoss",
+                },
+                null,
+              ],
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "riskReward",
+          profit: { $sum: "$profit" },
+          loss: { $sum: "$loss" },
+        },
+      },
+    ]);
+    const equityRiskReward = Math.ceil(
+      equityData[0].profit / Math.abs(equityData[0].loss)
+    );
+    const optionsData = await Options.aggregate([
+      {
+        $match: {
+          user: _id,
+        },
+      },
+      {
+        $project: {
+          profit: {
+            $sum: {
+              $cond: [
+                { $gt: ["$netProfitLoss", 0] },
+                { $sum: "$netProfitLoss" },
+                null,
+              ],
+            },
+          },
+          loss: {
+            $sum: {
+              $cond: [
+                {
+                  $lt: ["$netProfitLoss ", 0],
+                },
+                {
+                  $sum: "$netProfitLoss",
+                },
+                null,
+              ],
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "profitLoss",
+          loss: { $sum: "$loss" },
+          profit: { $sum: "$profit" },
+        },
+      },
+    ]);
+    const optionsRiskReward = Math.ceil(
+      optionsData[0].profit / Math.abs(optionsData[0].loss)
+    );
     res.status(200).json({
       message: "success",
+      data: {
+        optionsRiskReward,
+        equityRiskReward,
+      }
     });
   } catch (e) {
     console.log(e);
