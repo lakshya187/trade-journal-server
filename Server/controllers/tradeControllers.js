@@ -123,11 +123,17 @@ exports.updateClosingEnties = async (req, res) => {
       const { price, quantity } = el;
       val += price * quantity;
     });
+    let pl;
     const closePriceCal = val / currentDocument.tradeQuantity;
-
-    const pl =
-      (closePriceCal - currentDocument.openPrice) *
-      currentDocument.tradeQuantity;
+    if (currentDocument.typeOfTrade === "short") {
+      pl =
+        (currentDocument.openPrice - closePriceCal) *
+        currentDocument.tradeQuantity;
+    } else {
+      pl =
+        (closePriceCal - currentDocument.openPrice) *
+        currentDocument.tradeQuantity;
+    }
 
     const updatedTrade = await Trade.findByIdAndUpdate(
       req.params.id,
@@ -140,7 +146,7 @@ exports.updateClosingEnties = async (req, res) => {
         $set: {
           currentHoldings: currHoldings,
           closingPriceCalculated: closePriceCal,
-          profitLoss: pl,
+          profitLoss: pl.toFixed(1),
         },
       },
 
