@@ -8,6 +8,7 @@ const multer = require("multer");
 const { engine } = require("express-handlebars");
 const path = require("path");
 
+const tickerRouter = require("./routes/tickerRoutes");
 const combinedAnalysisRouter = require("./routes/combinedRoutes");
 const tradeRouter = require(`${__dirname}/routes/tradeRoutes`);
 const userRouter = require("./routes/userRoute");
@@ -42,4 +43,5 @@ app.use("/options", optionsRouter);
 app.use("/users", userRouter);
 app.use("/oAuth", thirdPartyRouter);
 app.use("/combined", combinedAnalysisRouter);
+app.use("/tickers", tickerRouter);
 module.exports = app;
