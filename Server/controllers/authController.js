@@ -18,7 +18,6 @@ exports.signUp = async (req, res, next) => {
       email: req.body.email,
       password: req.body.password,
       confirmPassword: req.body.confirmPassword,
-      // passwordChangedAt: req.body.passwordChangedAt,
     });
     const token = generateToken(newUser._id);
     res.status(201).json({
